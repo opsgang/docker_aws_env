@@ -14,19 +14,25 @@ git clone https://github.com/opsgang/alpine_build_scripts
 ## installing
 
 ```bash
-# ... replace /in/my/PATH below with somewhere in your $PATH
-docker pull opsgang/awscli:stable # or use x.y.z version as required.
+docker pull opsgang/aws_env:stable # or use the tag you prefer
 ```
 
 ## running
 
 ```bash
-# ... run like aws cli
-aws --region us-east-1 ec2 describe-images # ... or whatever else you need to do.
+# run a custom script /path/to/script.sh that uses aws cli, curl, jq blah ...
+docker run --rm -i -v /path/to/script.sh:/script.sh:ro opsgang/aws_env:stable /script.sh
 ```
 
-Note that the aws cmd is running within a container, so there are caveats when it comes to
-making AWS\_\* env vars or the local file-system available to the container
+```bash
+# make my aws creds available and run /some/python/script.py
+export AWS_ACCESS_KEY_ID="i'll-never-tell" # replace glibness with your access key
+export AWS_SECRET_ACCESS_KEY="that's-for-me-to-know" # amend as necessary
 
-See [README in .examples dir](https://github.com/opsgang/docker_awscli/tree/master/.examples)
-for how to use $DOCKER\_OPTS to get around those caveats.
+docker run --rm -i                      \ # ... run interactive to see stdout / stderr
+    -v /some/python/script.py:/my.py:ro \ # ... assume the file is executable
+    --env AWS_ACCESS_KEY_ID             \ # ... will read it from your env
+    --env AWS_SECRET_ACCESS_KEY         \ # ... will read it from your env
+    --env AWS_DEFAULT_REGION=eu-west-2  \ # ... adjust geography to taste
+    opsgang/aws_env:stable /my.py         # script will be able to access these AWS_ env vars
+```

@@ -2,9 +2,13 @@
 # vim: et sr sw=4 ts=4 smartindent:
 # helper script to generate label data for docker image during building
 #
+# docker_build will generate an image tagged :candidate
+#
+# It is a post-step to tag that appropriately and push to repo
 
 MIN_DOCKER=1.11.0
 GIT_SHA_LEN=8
+IMG_TAG=candidate
 
 version_gt() {
     [[ "$(printf '%s\n' "$@" | sort -V | head -n 1)" != "$1" ]]
@@ -38,13 +42,19 @@ _pypi_pkg_version() {
     | tail -1 || return 1
 }
 
-init_apk_versions() {
-    docker pull $(grep '(?<=^FROM ).*') || return 1
+alpine_img(){
+    grep '(?<=^FROM ).*' Dockerfile
 }
 
-_apk_pkg_version() {
-    local pkg="$1"
-    docker run -i --rm apk --no-cache --update info $pkg \
+init_apk_versions() {
+    local img="$1"
+    docker pull $img >/dev/null 2>&1 || return 1
+}
+
+apk_pkg_version() {
+    local img="$1"
+    local pkg="$2"
+    docker run -i --rm $img apk --no-cache --update info $pkg \
     | grep -Po "(?<=^$pkg-)[^ ]+(?= description:)"       \
     | head -n 1
 }
@@ -84,13 +94,6 @@ git_branch(){
     echo "$r"
 }
 
-img_version(){
-    (
-        set -o pipefail;
-        grep -Po '(?<=[vV]ersion=")[^"]+' Dockerfile | head -n 1
-    )
-}
-
 img_name(){
     (
         set -o pipefail;
@@ -99,15 +102,28 @@ img_name(){
 }
 
 labels() {
+    ai=$(alpine_img) || return 1
+    init_apk_versions $ai || return 1
+
+    av=$(awscli_version) || return 1
+    cv=$(credstash_version) || return 1
+    jv=$(apk_pkg_version $ai 'jq') || return 1
+    gu=$(git_uri) || return 1
+    gs=$(git_sha) || return 1
+    gb=$(git_branch) || return 1
+    gt=$(git describe || echo "untagged")
+    bb=$(built_by) || return 1
+
     cat<<EOM
-    --label opsgang.awscli_version=$(awscli_version)
-    --label opsgang.credstash_version=$(credstash_version)
-    --label opsgang.jq_version=$(jq_version)
-    --label opsgang.build_git_uri=$(git_uri)
-    --label opsgang.build_git_sha=$(git_sha)
-    --label opsgang.build_git_branch=$(git_branch)
-    --label opsgang.build_git_tag=$(img_version)
-    --label opsgang.built_by=$(built_by)
+    --label version=$(date +'%Y%m%d%H%M%S')
+    --label opsgang.awscli_version=$av
+    --label opsgang.credstash_version=$cv
+    --label opsgang.jq_version="$jv"
+    --label opsgang.build_git_uri=$gu
+    --label opsgang.build_git_sha=$gs
+    --label opsgang.build_git_branch=$gb
+    --label opsgang.build_git_tag=$gt
+    --label opsgang.built_by="$bb"
 EOM
 }
 
@@ -117,15 +133,8 @@ docker_build(){
 
     labels=$(labels) || return 1
     n=$(img_name) || return 1
-    v=$(img_version) || return 1
 
-    docker build --no-cache=true --force-rm $labels -t $n:$v .
-}
-
-git_tag(){
-    [[ -z "$TAG_INFO" ]] && echo "ERROR: define \$TAG_INFO" >&2 && return 1
-    git tag -a $img_version -m "${TAG_INFO}" \
-    && git push --tags
+    docker build --no-cache=true --force-rm $labels -t $n:$IMG_TAG .
 }
 
 docker_build

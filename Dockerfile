@@ -5,20 +5,19 @@ MAINTAINER jinal--shah <jnshah@gmail.com>
 LABEL \
       name="opsgang/awscli" \
       vendor="sortuniq"     \
-      version="1.0.0"       \
       description="... to run bash or python scripts, with awscli, credstash, curl, jq" \
 
 COPY alpine_build_scripts /alpine_build_scripts
 
-RUN chmod a+x /alpine_build_scripts/*.sh           \
-    && /alpine_build_scripts/install_vim.sh        \
-    && /alpine_build_scripts/install_awscli.sh     \
-    && /alpine_build_scripts/install_credstash.sh  \
-    && /alpine_build_scripts/install_essentials.sh \
+RUN sh /alpine_build_scripts/install_vim.sh        \
+    sh /alpine_build_scripts/install_awscli.sh     \
+    sh /alpine_build_scripts/install_credstash.sh  \
+    sh /alpine_build_scripts/install_essentials.sh \
     && rm -rf /var/cache/apk/* /alpine_build_scripts 2>/dev/null
 
 # built with additional labels:
 #
+# version
 # opsgang.awscli_version
 # opsgang.credstash_version
 # opsgang.jq_version
