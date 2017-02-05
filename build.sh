@@ -102,12 +102,18 @@ img_name(){
 }
 
 labels() {
+    echo "... getting alpine img" >&2
     ai=$(alpine_img) || return 1
+    echo "... $ai" >&2
     init_apk_versions $ai || return 1
+    echo "image pulled ... $ai" >&2
 
     av=$(awscli_version) || return 1
+    echo "awscli ... $av" >&2
     cv=$(credstash_version) || return 1
+    echo "credstash ... $cv" >&2
     jv=$(apk_pkg_version $ai 'jq') || return 1
+    echo "jq pkg version $jv"
     gu=$(git_uri) || return 1
     gs=$(git_sha) || return 1
     gb=$(git_branch) || return 1

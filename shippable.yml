@@ -16,6 +16,7 @@ build:
       && sudo mv jq-linux64 /usr/bin/jq
     - docker pull opsgang/aws_env:stable || true # speed up build layers
     - git clone https://github.com/opsgang/alpine_build_scripts --depth 1
+    - cat ./build_.sh
     - bash ./build.sh # avoid aufs file-locking with new shell
 
   on_success:
