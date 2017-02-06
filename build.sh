@@ -108,7 +108,6 @@ labels() {
     av=$(awscli_version) || return 1
     cv=$(credstash_version) || return 1
     jv=$(apk_pkg_version $ai 'jq') || return 1
-    echo "jq pkg version $jv" >&2
     gu=$(git_uri) || return 1
     gs=$(git_sha) || return 1
     gb=$(git_branch) || return 1
@@ -135,6 +134,9 @@ docker_build(){
     labels=$(labels) || return 1
     n=$(img_name) || return 1
 
+    echo "INFO: adding these labels: $labels"
+
+    echo "INFO: building $n:$IMG_TAG"
     docker build --no-cache=true --force-rm $labels -t $n:$IMG_TAG .
 }
 
