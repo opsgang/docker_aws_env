@@ -54,9 +54,9 @@ init_apk_versions() {
 apk_pkg_version() {
     local img="$1"
     local pkg="$2"
+
     docker run -i --rm $img apk --no-cache --update info $pkg \
-    | grep -Po "(?<=^$pkg-)[^ ]+(?= description:)"       \
-    | head -n 1
+    | grep -Po "(?<=^$pkg-)[^ ]+(?= description:)" | head -n 1
 }
 
 packer_version() {
@@ -102,22 +102,17 @@ img_name(){
 }
 
 labels() {
-    echo "... getting alpine img" >&2
     ai=$(alpine_img) || return 1
-    echo "... $ai" >&2
     init_apk_versions $ai || return 1
-    echo "image pulled ... $ai" >&2
 
     av=$(awscli_version) || return 1
-    echo "awscli ... $av" >&2
     cv=$(credstash_version) || return 1
-    echo "credstash ... $cv" >&2
     jv=$(apk_pkg_version $ai 'jq') || return 1
-    echo "jq pkg version $jv"
+    echo "jq pkg version $jv" >&2
     gu=$(git_uri) || return 1
     gs=$(git_sha) || return 1
     gb=$(git_branch) || return 1
-    gt=$(git describe || echo "untagged")
+    gt=$(git describe 2>/dev/null || echo "untagged")
     bb=$(built_by) || return 1
 
     cat<<EOM

@@ -3,7 +3,7 @@ FROM gliderlabs/alpine:3.4
 
 MAINTAINER jinal--shah <jnshah@gmail.com>
 LABEL \
-      name="opsgang/awscli" \
+      name="opsgang/aws_env" \
       vendor="sortuniq"     \
       description="... to run bash or python scripts, with awscli, credstash, curl, jq" \
 
