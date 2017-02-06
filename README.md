@@ -1,6 +1,17 @@
+[1]: http://docs.aws.amazon.com/cli/latest/reference "use aws apis from cmd line"
+[2]: https://github.com/fugue/credstash "credstash - store and retrieve secrets in aws"
+[3]: https://github.com/opsgang/alpine_build_scripts/blob/master/install_essentials.sh "common GNU tools useful for automation"
 # docker\_aws\_env
 _... defines an **alpine linux** container providing an env to run bash or_
 _python scripts, that need awscli, credstash, curl and / or jq._
+
+## featuring ...
+
+* [aws cli] [1]
+
+* [credstash] [2] (for managing secrets in aws)
+
+* bash, curl, git, make, jq, openssh client [and friends] [3]
 
 ## building
 
@@ -38,5 +49,5 @@ docker run --rm -i                      \ # ... run interactive to see stdout / 
     --env AWS_ACCESS_KEY_ID             \ # ... will read it from your env
     --env AWS_SECRET_ACCESS_KEY         \ # ... will read it from your env
     --env AWS_DEFAULT_REGION=eu-west-2  \ # ... adjust geography to taste
-    opsgang/aws_env:stable /my.py         # script will be able to access these AWS_ env vars
+    opsgang/aws_env:stable /my.py         # script can access these env vars
 ```
