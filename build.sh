@@ -43,7 +43,7 @@ _pypi_pkg_version() {
 }
 
 alpine_img(){
-    grep '(?<=^FROM ).*' Dockerfile
+    grep -Po '(?<=^FROM ).*' Dockerfile
 }
 
 init_apk_versions() {
