@@ -16,14 +16,13 @@ build:
       && sudo mv jq-linux64 /usr/bin/jq
     - docker pull opsgang/aws_env:stable || true # speed up build layers
     - git clone https://github.com/opsgang/alpine_build_scripts --depth 1
-    - cat ./build.sh
     - bash ./build.sh # avoid aufs file-locking with new shell
 
   on_success:
     - a=$(docker inspect opsgang/aws_env:candidate | jq -r '.[].Config.Labels')
     - echo $a | jq . # show me the labels please
     - v=$(echo $a | jq -r '.version')
-    - gv=$(echo $a | jq -r '."opsgang.git_tag"')
+    - gv=$(echo $a | jq -r '."opsgang.build_git_tag"')
     - echo "version tag is " $v
     - docker tag opsgang/aws_env:candidate opsgang/aws_env:$v
     - docker tag opsgang/aws_env:candidate opsgang/aws_env:$gv

@@ -111,7 +111,7 @@ labels() {
     gu=$(git_uri) || return 1
     gs=$(git_sha) || return 1
     gb=$(git_branch) || return 1
-    gt=$(git describe 2>/dev/null || echo "untagged")
+    gt=$(git describe 2>/dev/null || echo "no-git-tag")
     bb=$(built_by) || return 1
 
     cat<<EOM
