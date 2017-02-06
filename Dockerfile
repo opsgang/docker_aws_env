@@ -9,10 +9,10 @@ LABEL \
 
 COPY alpine_build_scripts /alpine_build_scripts
 
-RUN sh /alpine_build_scripts/install_vim.sh        \
-    sh /alpine_build_scripts/install_awscli.sh     \
-    sh /alpine_build_scripts/install_credstash.sh  \
-    sh /alpine_build_scripts/install_essentials.sh \
+RUN sh /alpine_build_scripts/install_vim.sh           \
+    && sh /alpine_build_scripts/install_awscli.sh     \
+    && sh /alpine_build_scripts/install_credstash.sh  \
+    && sh /alpine_build_scripts/install_essentials.sh \
     && rm -rf /var/cache/apk/* /alpine_build_scripts 2>/dev/null
 
 # built with additional labels:

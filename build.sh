@@ -134,9 +134,10 @@ docker_build(){
     labels=$(labels) || return 1
     n=$(img_name) || return 1
 
-    echo "INFO: adding these labels: $labels"
-
+    echo "INFO: adding these labels:"
+    echo "$labels"
     echo "INFO: building $n:$IMG_TAG"
+
     docker build --no-cache=true --force-rm $labels -t $n:$IMG_TAG .
 }
 
