@@ -4,9 +4,13 @@ _python scripts, that need awscli, credstash, curl and / or jq._
 
 ## building
 
+**master branch built at shippable.com**
+
+[![Run Status](https://api.shippable.com/projects/589464f08d80360f008b754e/badge?branch=master)](https://app.shippable.com/projects/589464f08d80360f008b754e)
+
 ```bash
-git clone https://github.com/opsgang/docker_awscli.git
-cd docker_awscli
+git clone https://github.com/opsgang/docker_aws_env.git
+cd docker_aws_env
 git clone https://github.com/opsgang/alpine_build_scripts
 ./build.sh # adds custom labels to image
 ```
