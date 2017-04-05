@@ -23,50 +23,6 @@ valid_docker_version() {
     fi
 }
 
-awscli_version() {
-    _pypi_pkg_version 'awscli'
-}
-
-credstash_version() {
-    _pypi_pkg_version 'credstash'
-}
-
-_pypi_pkg_version() {
-    local pkg="$1"
-    local uri="https://pypi.python.org/pypi/$pkg/json"
-    curl -s --retry 5                \
-        --retry-max-time 20 $uri     \
-    | jq -r '.releases | keys | .[]' \
-        2>/dev/null                  \
-    | sort --version-sort            \
-    | tail -1 || return 1
-}
-
-alpine_img(){
-    grep -Po '(?<=^FROM ).*' Dockerfile
-}
-
-init_apk_versions() {
-    local img="$1"
-    docker pull $img >/dev/null 2>&1 || return 1
-}
-
-apk_pkg_version() {
-    local img="$1"
-    local pkg="$2"
-
-    docker run -i --rm $img apk --no-cache --update info $pkg \
-    | grep -Po "(?<=^$pkg-)[^ ]+(?= description:)" | head -n 1
-}
-
-packer_version() {
-    echo $PACKER_VERSION
-}
-
-terraform_version() {
-    echo $TERRAFORM_VERSION
-}
-
 built_by() {
     local user="--UNKNOWN--"
     if [[ ! -z "${BUILD_URL}" ]]; then
@@ -102,12 +58,6 @@ img_name(){
 }
 
 labels() {
-    ai=$(alpine_img) || return 1
-    init_apk_versions $ai || return 1
-
-    av=$(awscli_version) || return 1
-    cv=$(credstash_version) || return 1
-    jv=$(apk_pkg_version $ai 'jq') || return 1
     gu=$(git_uri) || return 1
     gs=$(git_sha) || return 1
     gb=$(git_branch) || return 1
@@ -116,9 +66,6 @@ labels() {
 
     cat<<EOM
     --label version=$(date +'%Y%m%d%H%M%S')
-    --label opsgang.awscli_version=$av
-    --label opsgang.credstash_version=$cv
-    --label opsgang.jq_version="$jv"
     --label opsgang.build_git_uri=$gu
     --label opsgang.build_git_sha=$gs
     --label opsgang.build_git_branch=$gb
