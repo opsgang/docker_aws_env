@@ -14,19 +14,20 @@ build:
     - curl -O -L https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64
       && chmod +x jq-linux64
       && sudo mv jq-linux64 /usr/bin/jq
-    - docker pull opsgang/coreos_aws_hostcfg:stable || true # speed up build layers
+    - docker pull opsgang/aws_env:stable || true # speed up build layers
+    - git clone https://github.com/opsgang/alpine_build_scripts --depth 1
     - bash ./build.sh # avoid aufs file-locking with new shell
 
   on_success:
-    - a=$(docker inspect opsgang/coreos_aws_hostcfg:candidate | jq -r '.[].Config.Labels')
+    - a=$(docker inspect opsgang/aws_env:candidate | jq -r '.[].Config.Labels')
     - echo $a | jq . # show me the labels please
     - v=$(echo $a | jq -r '.version')
     - gv=$(echo $a | jq -r '."opsgang.build_git_tag"')
     - echo "version tag is " $v
-    - docker tag opsgang/coreos_aws_hostcfg:candidate opsgang/coreos_aws_hostcfg:$v
-    - docker tag opsgang/coreos_aws_hostcfg:candidate opsgang/coreos_aws_hostcfg:$gv
-    - docker tag opsgang/coreos_aws_hostcfg:candidate opsgang/coreos_aws_hostcfg:stable
+    - docker tag opsgang/aws_env:candidate opsgang/aws_env:$v
+    - docker tag opsgang/aws_env:candidate opsgang/aws_env:$gv
+    - docker tag opsgang/aws_env:candidate opsgang/aws_env:stable
     - docker login -p $DHP -u $DHU
-    - docker push opsgang/coreos_aws_hostcfg:$v
-    - docker push opsgang/coreos_aws_hostcfg:$gv
-    - docker push opsgang/coreos_aws_hostcfg:stable
+    - docker push opsgang/aws_env:$v
+    - docker push opsgang/aws_env:$gv
+    - docker push opsgang/aws_env:stable

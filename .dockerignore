@@ -2,4 +2,3 @@ build.sh
 **/*.pem
 **/*.tmpl
 **/*.swp
-*.md
