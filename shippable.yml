@@ -8,6 +8,7 @@ branches:
 env:
   global:
     - IMG="aws_env"
+    - STABLE_TAG="alpine-3.6"
     - SR="https://github.com/opsgang/alpine_build_scripts"
     - JQ="https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64"
 
@@ -17,7 +18,7 @@ build:
     - curl -O -L $JQ
       && chmod +x jq-linux64
       && sudo mv jq-linux64 /usr/bin/jq
-    - docker pull opsgang/$IMG:stable || true # speed up build layers
+    - docker pull opsgang/$IMG:$STABLE_TAG || true # speed up build layers
     - git clone $SR --depth 1
     - bash ./build.sh # avoid aufs file-locking with new shell
 
@@ -26,7 +27,7 @@ build:
         a=$(docker inspect opsgang/$IMG:candidate | jq -r '.[].Config.Labels') ;
         v=$(echo $a | jq -r '.version') ;
         gt=$(echo $a | jq -r '."opsgang.build_git_tag"') ;
-        tags="$v $gt alpine-3.6" ; echo $a | jq . ; echo "docker tags:($tags)" ;
+        tags="$v $gt $STABLE_TAG" ; echo $a | jq . ; echo "docker tags:($tags)" ;
         for t in $tags; do
           docker tag opsgang/$IMG:candidate opsgang/$IMG:$t;
           docker push opsgang/$IMG:$t;
