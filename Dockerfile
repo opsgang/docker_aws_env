@@ -1,5 +1,5 @@
 # vim: et sr sw=4 ts=4 smartindent syntax=dockerfile:
-FROM gliderlabs/alpine:3.4
+FROM gliderlabs/alpine:3.6
 
 MAINTAINER jinal--shah <jnshah@gmail.com>
 LABEL \
