@@ -4,13 +4,11 @@ language: none
 branches:
   only:
     - master
-    - alpha
 
 env:
   global:
     - IMG="aws_env"
     - STABLE_TAG="stable"
-    - SR="https://github.com/opsgang/alpine_build_scripts"
     - JQ="https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64"
 
 build:
@@ -42,7 +40,6 @@ integrations:
       branches:
         only:
           - master
-          - alpha
 
   notifications:
     - integrationName: opsgang_slack_delivery
@@ -51,7 +48,6 @@ integrations:
       branches:
         only:
           - master
-          - alpha
       on_success: always
       on_failure: always
       on_pull_request: never
