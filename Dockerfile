@@ -7,12 +7,14 @@ LABEL \
       vendor="sortuniq"     \
       description="... to run bash or python scripts, with awscli, credstash, curl, jq"
 
-COPY fetch /usr/local/bin/fetch
+COPY fetch /var/tmp/fetch
 
 ENV SCRIPTS_REPO="https://github.com/opsgang/alpine_build_scripts"
 
 RUN apk --no-cache --update add ca-certificates \
-    && sh -c "chmod a+x /usr/local/bin/fetch" \
+    && echo "copying fetch" \
+    && ( sh -c "cp /var/tmp/fetch /usr/local/bin/fetch" ) \
+    && ( sh -c "chmod a+x /usr/local/bin/fetch" ) \
     && sh -c "fetch --repo ${SCRIPTS_REPO} --tag='~>1.0' /scripts" \
     && sh /scripts/install_vim.sh        \
     && sh /scripts/install_awscli.sh     \
