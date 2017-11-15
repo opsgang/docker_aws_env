@@ -31,6 +31,10 @@ credstash_version() {
     _pypi_pkg_version 'credstash'
 }
 
+fetch_version() {
+    ./fetch --version | grep -Po 'v[\d\.]+'
+}
+
 _pypi_pkg_version() {
     local pkg="$1"
     local uri="https://pypi.python.org/pypi/$pkg/json"
@@ -107,6 +111,7 @@ labels() {
 
     av=$(awscli_version) || return 1
     cv=$(credstash_version) || return 1
+    fv=$(fetch_version) || return 1
     jv=$(apk_pkg_version $ai 'jq') || return 1
     gu=$(git_uri) || return 1
     gs=$(git_sha) || return 1
@@ -118,7 +123,8 @@ labels() {
     --label version=$(date +'%Y%m%d%H%M%S')
     --label opsgang.awscli_version=$av
     --label opsgang.credstash_version=$cv
-    --label opsgang.jq_version="$jv"
+    --label opsgang.fetch_version=$fv
+    --label opsgang.jq_version=$jv
     --label opsgang.build_git_uri=$gu
     --label opsgang.build_git_sha=$gs
     --label opsgang.build_git_branch=$gb
@@ -127,9 +133,44 @@ labels() {
 EOM
 }
 
+latest_fetch_binary() {
+    local FETCH_REPO="https://github.com/opsgang/fetch"
+    local FETCH_BOOT_VERSION="v0.1.1" # fixed tag to use to get latest "stable"
+    local FETCH_DESIRED="~>0.1.0"
+    local FETCH_RELEASE_URL="${FETCH_REPO}/releases/download/${FETCH_BOOT_VERSION}/fetch.tgz"
+
+    set -o pipefail
+    if ! curl -sS -L -H 'Accept: application/octet-stream' $FETCH_RELEASE_URL | tar -xzv
+    then
+        echo "ERROR: could not fetch bootstrap 'fetch' binary from $FETCH_RELEASE_URL" >&2
+        return 1
+    fi
+
+    mv fetch fetch.init
+
+    echo "INFO: getting latest fetch (semver constraint: $FETCH_DESIRED)"
+    if ! ./fetch.init --repo ${FETCH_REPO} --tag="${FETCH_DESIRED}" --release-asset="fetch.tgz" .
+    then
+        echo "ERROR: could not fetch a better version of fetch binary" >&2
+        return 1
+    fi
+
+    tar xzvf fetch.tgz >/dev/null 2>&1
+
+    if ! ls -1 fetch | grep -Po '^fetch$' >/dev/null 2>&1
+    then
+        echo "ERROR: could not extract fetch binary from tgz"
+        return 1
+    fi
+    rm -rf fetch.init fetch.tgz
+    return 0
+}
+
 docker_build(){
 
     valid_docker_version || return 1
+
+    latest_fetch_binary || return 1
 
     labels=$(labels) || return 1
     n=$(img_name) || return 1

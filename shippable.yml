@@ -4,6 +4,7 @@ language: none
 branches:
   only:
     - master
+    - alpha
 
 env:
   global:
@@ -19,7 +20,6 @@ build:
       && chmod +x jq-linux64
       && sudo mv jq-linux64 /usr/bin/jq
     - docker pull opsgang/$IMG:$STABLE_TAG || true # speed up build layers
-    - git clone $SR --depth 1
     - bash ./build.sh # avoid aufs file-locking with new shell
 
   on_success:
@@ -42,6 +42,7 @@ integrations:
       branches:
         only:
           - master
+          - alpha
 
   notifications:
     - integrationName: opsgang_slack_delivery
@@ -50,6 +51,7 @@ integrations:
       branches:
         only:
           - master
+          - alpha
       on_success: always
       on_failure: always
       on_pull_request: never
