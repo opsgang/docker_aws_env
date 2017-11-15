@@ -4,6 +4,7 @@ language: none
 branches:
   only:
     - master
+    - alpha
 
 env:
   global:
@@ -40,6 +41,7 @@ integrations:
       branches:
         only:
           - master
+          - alpha
 
   notifications:
     - integrationName: opsgang_slack_delivery
@@ -48,6 +50,7 @@ integrations:
       branches:
         only:
           - master
+          - alpha
       on_success: always
       on_failure: always
       on_pull_request: never

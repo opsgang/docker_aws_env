@@ -12,8 +12,8 @@ COPY fetch /usr/local/bin/fetch
 ENV SCRIPTS_REPO="https://github.com/opsgang/alpine_build_scripts"
 
 RUN apk --no-cache --update add ca-certificates \
-    && chmod a+x /usr/local/bin/fetch \
-    && fetch --repo ${SCRIPTS_REPO} --tag="~>1.0" /scripts \
+    && sh -c "chmod a+x /usr/local/bin/fetch" \
+    && sh -c "fetch --repo ${SCRIPTS_REPO} --tag='~>1.0' /scripts" \
     && sh /scripts/install_vim.sh        \
     && sh /scripts/install_awscli.sh     \
     && sh /scripts/install_credstash.sh  \
