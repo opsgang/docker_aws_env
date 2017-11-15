@@ -5,7 +5,7 @@ MAINTAINER jinal--shah <jnshah@gmail.com>
 LABEL \
       name="opsgang/aws_env" \
       vendor="sortuniq"     \
-      description="... to run bash or python scripts, with awscli, credstash, curl, jq"
+      description="... to run bash or python code, with awscli, credstash, curl, fetch, jq"
 
 COPY fetch /var/tmp/fetch
 
@@ -16,13 +16,13 @@ RUN apk --no-cache --update add ca-certificates \
     && ( sh -c "cp /var/tmp/fetch /usr/local/bin/fetch" ) \
     && echo "chmoding fetch" \
     && ( sh -c "chmod a+x /usr/local/bin/fetch" ) \
-    && echo "running fetch" \
-    && sh -c "fetch --repo ${SCRIPTS_REPO} --tag='~>1.0' /scripts" \
+    && echo "running fetch to get ${SCRIPTS_REPO}" \
+    && ( sh -c "fetch --repo ${SCRIPTS_REPO} --tag='~>1.0' /scripts" ) \
     && sh /scripts/install_vim.sh        \
     && sh /scripts/install_awscli.sh     \
     && sh /scripts/install_credstash.sh  \
     && sh /scripts/install_essentials.sh \
-    && rm -rf /var/cache/apk/* /scripts 2>/dev/null
+    && rm -rf /var/tmp/fetch /var/cache/apk/* /scripts 2>/dev/null
 
 # built with additional labels:
 #
