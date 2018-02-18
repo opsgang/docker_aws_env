@@ -12,7 +12,7 @@ ENV SCRIPTS_REPO="https://github.com/opsgang/alpine_build_scripts"
 
 RUN apk --no-cache --update add ca-certificates \
     && echo "copying fetch" \
-    && ( sh -c "cp /var/tmp/fetch /usr/local/bin/fetch" ) \
+    && ( sh -c "cp /var/tmp/fetch /usr/local/bin/ghfetch" ) \
     && echo "chmoding fetch" \
     && ( sh -c "chmod a+x /usr/local/bin/fetch" ) \
     && echo "running fetch to get ${SCRIPTS_REPO}" \
