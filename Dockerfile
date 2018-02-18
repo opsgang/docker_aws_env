@@ -1,5 +1,5 @@
 # vim: et sr sw=4 ts=4 smartindent syntax=dockerfile:
-FROM gliderlabs/alpine:3.7
+FROM alpine:3.7
 
 LABEL \
       name="opsgang/aws_env" \

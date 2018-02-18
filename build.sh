@@ -107,18 +107,28 @@ img_name(){
 
 labels() {
     ai=$(alpine_img) || return 1
+    echo "... got base image $ai" >&2
     init_apk_versions $ai || return 1
 
     av=$(awscli_version) || return 1
+    echo "... got awscli version $av" >&2
+
     cv=$(credstash_version) || return 1
+    echo "... got credstash version $cv" >&2
+
     fv=$(fetch_version) || return 1
+    echo "... got fetch version $fv" >&2
+
     jv=$(apk_pkg_version $ai 'jq') || return 1
+    echo "... got jq version $jv" >&2
+
     gu=$(git_uri) || return 1
     gs=$(git_sha) || return 1
     gb=$(git_branch) || return 1
     gt=$(git describe 2>/dev/null || echo "no-git-tag")
     bb=$(built_by) || return 1
 
+    echo "... got all label data" >&2
     cat<<EOM
     --label version=$(date +'%Y%m%d%H%M%S')
     --label opsgang.alpine_version=$ai
@@ -162,6 +172,8 @@ latest_fetch_binary() {
     then
         echo "ERROR: could not extract fetch binary from tgz"
         return 1
+    else
+        echo "INFO: I've, um, fetched 'fetch' :)"
     fi
     rm -rf fetch.init fetch.tgz
     return 0
