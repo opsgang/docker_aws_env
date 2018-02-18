@@ -1,7 +1,6 @@
 # vim: et sr sw=4 ts=4 smartindent syntax=dockerfile:
-FROM gliderlabs/alpine:3.6
+FROM gliderlabs/alpine:3.7
 
-MAINTAINER jinal--shah <jnshah@gmail.com>
 LABEL \
       name="opsgang/aws_env" \
       vendor="sortuniq"     \
@@ -27,10 +26,11 @@ RUN apk --no-cache --update add ca-certificates \
 # built with additional labels:
 #
 # version
+# opsgang.alpine_version
 # opsgang.awscli_version
 # opsgang.credstash_version
+# opsgang.fetch_version
 # opsgang.jq_version
-#
 # opsgang.build_git_uri
 # opsgang.build_git_sha
 # opsgang.build_git_branch

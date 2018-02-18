@@ -35,8 +35,8 @@ build:
 
 integrations:
   hub:
-    - integrationName: opsgang_dockerhub
-      type: docker
+    - integrationName: opsgang_dockerhubreg
+      type: dockerRegistryLogin
       branches:
         only:
           - master
