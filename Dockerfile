@@ -6,7 +6,7 @@ LABEL \
       vendor="sortuniq"     \
       description="... to run bash or python code, with awscli, credstash, curl, fetch, jq"
 
-COPY fetch /var/tmp/fetch
+COPY ghfetch /var/tmp/ghfetch
 
 ENV SCRIPTS_REPO="https://github.com/opsgang/alpine_build_scripts"
 
