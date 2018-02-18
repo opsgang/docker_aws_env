@@ -18,6 +18,7 @@ RUN apk --no-cache --update add ca-certificates \
     && echo "running fetch to get ${SCRIPTS_REPO}" \
     && ( sh -c "fetch --repo ${SCRIPTS_REPO} --tag='~>1.0' /scripts" ) \
     && sh /scripts/install_vim.sh        \
+    && cp /etc/vim/vimrc /root/.vimrc    \
     && sh /scripts/install_awscli.sh     \
     && sh /scripts/install_credstash.sh  \
     && sh /scripts/install_essentials.sh \
