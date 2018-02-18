@@ -8,7 +8,7 @@ branches:
 env:
   global:
     - IMG="aws_env"
-    - STABLE_TAG="stable"
+    - STABLE_TAG="stable-3.7"
     - JQ="https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64"
 
 build:
@@ -35,8 +35,8 @@ build:
 
 integrations:
   hub:
-    - integrationName: opsgang_dockerhub
-      type: docker
+    - integrationName: opsgang_dockerhubreg
+      type: dockerRegistryLogin
       branches:
         only:
           - master
