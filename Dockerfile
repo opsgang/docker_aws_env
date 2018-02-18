@@ -13,7 +13,7 @@ ENV SCRIPTS_REPO="https://github.com/opsgang/alpine_build_scripts"
 # ... the subshells below are to avoid any
 # aufs locking unpleasantness from shippable
 RUN apk --no-cache --update add ca-certificates \
-    && ( sh -c "cp /var/tmp/fetch /usr/local/bin/ghfetch" ) \
+    && ( sh -c "cp /var/tmp/ghfetch /usr/local/bin/ghfetch" ) \
     && ( sh -c "chmod a+x /usr/local/bin/ghfetch" ) \
     && ( sh -c "ghfetch --repo ${SCRIPTS_REPO} --tag='~>1.0' /scripts" ) \
     && sh /scripts/install_vim.sh        \
@@ -21,7 +21,7 @@ RUN apk --no-cache --update add ca-certificates \
     && sh /scripts/install_awscli.sh     \
     && sh /scripts/install_credstash.sh  \
     && sh /scripts/install_essentials.sh \
-    && rm -rf /var/tmp/fetch /var/cache/apk/* /scripts 2>/dev/null
+    && rm -rf /var/tmp/ghfetch /var/cache/apk/* /scripts 2>/dev/null
 
 # built with additional labels:
 #

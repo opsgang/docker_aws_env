@@ -144,6 +144,10 @@ labels() {
 EOM
 }
 
+# Currently we are using the opsgang fork of gruntwork's 'fetch'.
+# Amongst other changes, we are renaming the binary ghfetch
+# as it only works with the github api, not other git services.
+# Until we make those changes to our fork, we do the renaming here.
 latest_ghfetch_binary() {
     local FETCH_REPO="https://github.com/opsgang/fetch"
     local FETCH_BOOT_VERSION="v0.1.1" # fixed tag to use to get latest "stable"
@@ -174,6 +178,8 @@ latest_ghfetch_binary() {
         return 1
     else
         echo "INFO: I've, um, fetched 'fetch' :)"
+        echo "INFO: ... renaming to more accurate ghfetch"
+        mv fetch ghfetch
     fi
     rm -rf fetch.init fetch.tgz
     return 0
