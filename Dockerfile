@@ -15,7 +15,7 @@ ENV SCRIPTS_REPO="https://github.com/opsgang/alpine_build_scripts"
 RUN apk --no-cache --update add ca-certificates \
     && ( sh -c "cp /var/tmp/fetch /usr/local/bin/ghfetch" ) \
     && ( sh -c "chmod a+x /usr/local/bin/ghfetch" ) \
-    && ( sh -c "fetch --repo ${SCRIPTS_REPO} --tag='~>1.0' /scripts" ) \
+    && ( sh -c "ghfetch --repo ${SCRIPTS_REPO} --tag='~>1.0' /scripts" ) \
     && sh /scripts/install_vim.sh        \
     && cp /etc/vim/vimrc /root/.vimrc    \
     && sh /scripts/install_awscli.sh     \

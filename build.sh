@@ -31,8 +31,8 @@ credstash_version() {
     _pypi_pkg_version 'credstash'
 }
 
-fetch_version() {
-    ./fetch --version | grep -Po 'v[\d\.]+'
+ghfetch_version() {
+    ./ghfetch --version | grep -Po 'v[\d\.]+'
 }
 
 _pypi_pkg_version() {
@@ -116,8 +116,8 @@ labels() {
     cv=$(credstash_version) || return 1
     echo "... got credstash version $cv" >&2
 
-    fv=$(fetch_version) || return 1
-    echo "... got fetch version $fv" >&2
+    fv=$(ghfetch_version) || return 1
+    echo "... got ghfetch version $fv" >&2
 
     jv=$(apk_pkg_version $ai 'jq') || return 1
     echo "... got jq version $jv" >&2
@@ -134,7 +134,7 @@ labels() {
     --label opsgang.alpine_version=$ai
     --label opsgang.awscli_version=$av
     --label opsgang.credstash_version=$cv
-    --label opsgang.fetch_version=$fv
+    --label opsgang.ghfetch_version=$fv
     --label opsgang.jq_version=$jv
     --label opsgang.build_git_uri=$gu
     --label opsgang.build_git_sha=$gs
@@ -144,7 +144,7 @@ labels() {
 EOM
 }
 
-latest_fetch_binary() {
+latest_ghfetch_binary() {
     local FETCH_REPO="https://github.com/opsgang/fetch"
     local FETCH_BOOT_VERSION="v0.1.1" # fixed tag to use to get latest "stable"
     local FETCH_DESIRED="~>0.1.0"
@@ -183,7 +183,7 @@ docker_build(){
 
     valid_docker_version || return 1
 
-    latest_fetch_binary || return 1
+    latest_ghfetch_binary || return 1
 
     labels=$(labels) || return 1
     n=$(img_name) || return 1
