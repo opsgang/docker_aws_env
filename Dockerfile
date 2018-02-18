@@ -10,12 +10,11 @@ COPY fetch /var/tmp/fetch
 
 ENV SCRIPTS_REPO="https://github.com/opsgang/alpine_build_scripts"
 
+# ... the subshells below are to avoid any
+# aufs locking unpleasantness from shippable
 RUN apk --no-cache --update add ca-certificates \
-    && echo "copying fetch" \
     && ( sh -c "cp /var/tmp/fetch /usr/local/bin/ghfetch" ) \
-    && echo "chmoding fetch" \
-    && ( sh -c "chmod a+x /usr/local/bin/fetch" ) \
-    && echo "running fetch to get ${SCRIPTS_REPO}" \
+    && ( sh -c "chmod a+x /usr/local/bin/ghfetch" ) \
     && ( sh -c "fetch --repo ${SCRIPTS_REPO} --tag='~>1.0' /scripts" ) \
     && sh /scripts/install_vim.sh        \
     && cp /etc/vim/vimrc /root/.vimrc    \
