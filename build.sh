@@ -37,7 +37,7 @@ ghfetch_version() {
 
 _pypi_pkg_version() {
     local pkg="$1"
-    local uri="https://pypi.python.org/pypi/$pkg/json"
+    local uri="https://pypi.org/pypi/$pkg/json"
     curl -s --retry 5                \
         --retry-max-time 20 $uri     \
     | jq -r '.releases | keys | .[]' \
@@ -186,9 +186,7 @@ latest_ghfetch_binary() {
 }
 
 docker_build(){
-
     valid_docker_version || return 1
-
     latest_ghfetch_binary || return 1
 
     labels=$(labels) || return 1
