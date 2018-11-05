@@ -7,11 +7,22 @@ _python scripts, that need awscli, credstash, curl and / or jq._
 
 ## featuring ...
 
-* [aws cli] [1]
+* [aws cli][1]
 
-* [credstash] [2] (for managing secrets in aws)
+* [credstash][2] (for managing secrets in aws)
 
-* bash, curl, git, make, jq, openssh client [and friends] [3]
+* bash, curl, git, make, jq, openssh client [and friends][3]
+
+## docker tags
+
+>
+> You are encouraged to use the semver docker tags.
+>
+> You can peg to the latest major, or latest major.minor version
+> instead of a specific major.minor.patch version if you prefer.
+>
+> e.g. opsgang/aws\_env:1 # the latest 1.x.x
+>      opsgang/aws\_env:1.2 # the latest 1.2.x
 
 ## building
 

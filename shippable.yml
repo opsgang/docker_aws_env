@@ -21,11 +21,22 @@ build:
     - bash ./build.sh # avoid aufs file-locking with new shell
 
   on_success:
-    - if [[ "$BRANCH" == "master" ]] && [[ "$IS_PULL_REQUEST" != "true" ]]; then
+    - build="no"
+      [[ "$BRANCH" == "master" ]] && [[ "$IS_PULL_REQUEST" == "false" ]] && build="yes"
+      [[ "IS_GIT_TAG" == "true" ]] && build ="yes"
+
+      if [[ "$build" == "yes" ]]; then
         a=$(docker inspect opsgang/$IMG:candidate | jq -r '.[].Config.Labels') ;
         v=$(echo $a | jq -r '.version') ;
-        gt=$(echo $a | jq -r '."opsgang.build_git_tag"') ;
-        tags="$v $gt $STABLE_TAG" ; echo $a | jq . ; echo "docker tags:($tags)" ;
+        echo $a | jq . ; echo "docker tags:($tags)" ;
+
+        tags="$v $STABLE_TAG"
+        if [[ "$IS_GIT_TAG" == "true" ]] && [[ "$GIT_TAG_NAME" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] ; then
+          major=${GIT_TAG_NAME%%\.*}
+          major_minor=${GIT_TAG_NAME%\.*}
+          tags="$tags $major $major_minor $GIT_TAG_NAME"
+        fi
+
         for t in $tags; do
           docker tag opsgang/$IMG:candidate opsgang/$IMG:$t;
           docker push opsgang/$IMG:$t;
