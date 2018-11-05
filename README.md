@@ -2,6 +2,7 @@
 [2]: https://github.com/fugue/credstash "credstash - store and retrieve secrets in aws"
 [3]: https://github.com/opsgang/alpine_build_scripts/blob/master/install_essentials.sh "common GNU tools useful for automation"
 # docker\_aws\_env
+
 _... defines an **alpine linux** container providing an env to run bash or_
 _python scripts, that need awscli, credstash, curl and / or jq._
 
