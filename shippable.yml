@@ -23,18 +23,20 @@ build:
   on_success:
     - build="no";
       [[ "$BRANCH" == "master" ]] && [[ "$IS_PULL_REQUEST" == "false" ]] && build="yes" ;
-      [[ "IS_GIT_TAG" == "true" ]] && build ="yes" ;
+      [[ "$IS_GIT_TAG" == "true" ]] && build="yes" ;
 
       if [[ "$build" == "yes" ]]; then
         a=$(docker inspect opsgang/$IMG:candidate | jq -r '.[].Config.Labels') ;
+        echo $a | jq . ;
+
         v=$(echo $a | jq -r '.version') ;
-        echo $a | jq . ; echo "docker tags:($tags)" ;
+        gt=$(echo $a | jq -r '."opsgang.build_git_tag"') ;
 
         tags="$v $STABLE_TAG" ;
-        if [[ "$IS_GIT_TAG" == "true" ]] && [[ "$GIT_TAG_NAME" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] ; then
-          major=${GIT_TAG_NAME%%\.*} ;
-          major_minor=${GIT_TAG_NAME%\.*} ;
-          tags="$tags $major $major_minor $GIT_TAG_NAME" ;
+        if [[ "$gt" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] ; then
+          major="${gt%%\.*}" ; major_minor="${gt%\.*}" ;
+          tags="$tags $major $major_minor $gt" ;
+          echo "docker tags:($tags)" ;
         fi ;
 
         for t in $tags; do
