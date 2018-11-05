@@ -9,7 +9,7 @@ env:
   global:
     - IMG="aws_env"
     - STABLE_TAG="stable"
-    - JQ="https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64"
+    - JQ="https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64"
 
 build:
 
