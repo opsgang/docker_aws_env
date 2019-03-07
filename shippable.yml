@@ -21,11 +21,7 @@ build:
     - bash ./build.sh # avoid aufs file-locking with new shell
 
   on_success:
-    - build="no";
-      [[ "$BRANCH" == "master" ]] && [[ "$IS_PULL_REQUEST" == "false" ]] && build="yes" ;
-      [[ "$IS_GIT_TAG" == "true" ]] && build="yes" ;
-
-      if [[ "$build" == "yes" ]]; then
+    - if [[ "$IS_GIT_TAG" == "true" ]] || [[ "$IS_RELEASE" == "true" ]]; then
         a=$(docker inspect opsgang/$IMG:candidate | jq -r '.[].Config.Labels') ;
         echo $a | jq . ;
 
