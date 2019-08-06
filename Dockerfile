@@ -1,39 +1,28 @@
 # vim: et sr sw=4 ts=4 smartindent syntax=dockerfile:
-FROM alpine:3.8
+FROM alpine:3.10
 
 LABEL \
       name="opsgang/aws_env" \
       vendor="sortuniq"     \
-      description="... to run bash or python code, with awscli, credstash, curl, fetch, jq"
+      description="... to run bash or python code, with awscli, curl, gogitget, jq"
 
-COPY ghfetch /var/tmp/ghfetch
+COPY build build/
 
-ENV SCRIPTS_REPO="https://github.com/opsgang/alpine_build_scripts"
+# ... all args used to install g3 tool (gogitget)
+# vals come from build.sh
+ARG g3_repo
+ARG g3_desired_constraint
+ARG g3_init
+ARG g3_release_name
+ARG g3_extracted_bin
 
 # ... the subshells below are to avoid any
 # aufs locking unpleasantness from shippable
 RUN apk --no-cache --update add ca-certificates \
-    && ( sh -c "cp /var/tmp/ghfetch /usr/local/bin/ghfetch" ) \
-    && ( sh -c "chmod a+x /usr/local/bin/ghfetch" ) \
-    && ( sh -c "ghfetch --repo ${SCRIPTS_REPO} --tag='~>1.0' /scripts" ) \
-    && sh /scripts/install_vim.sh        \
-    && cp /etc/vim/vimrc /root/.vimrc    \
-    && sh /scripts/install_awscli.sh     \
-    && sh /scripts/install_credstash.sh  \
-    && sh /scripts/install_essentials.sh \
-    && rm -rf /var/tmp/ghfetch /var/cache/apk/* /scripts 2>/dev/null
+    && sh /build/mock_deprecated_capabilities.sh \
+    && sh /build/install_g3.sh \
+    && sh /build/install_awscli.sh \
+    && sh /build/install_essentials.sh \
+    rm -rf /var/cache/apk/* /build 2>/dev/null
 
-# built with additional labels:
-#
-# version
-# opsgang.alpine_version
-# opsgang.awscli_version
-# opsgang.credstash_version
-# opsgang.fetch_version
-# opsgang.jq_version
-# opsgang.build_git_uri
-# opsgang.build_git_sha
-# opsgang.build_git_branch
-# opsgang.build_git_tag
-# opsgang.built_by
-#
+# built with additional labels - see build.sh

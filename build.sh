@@ -27,12 +27,8 @@ awscli_version() {
     _pypi_pkg_version 'awscli'
 }
 
-credstash_version() {
-    _pypi_pkg_version 'credstash'
-}
-
-ghfetch_version() {
-    ./ghfetch --version | grep -Po 'v[\d\.]+'
+g3_version() {
+    $g3_init --version | grep -Po 'v[\d\.]+'
 }
 
 _pypi_pkg_version() {
@@ -61,14 +57,6 @@ apk_pkg_version() {
 
     docker run -i --rm $img apk --no-cache --update info $pkg \
     | grep -Po "(?<=^$pkg-)[^ ]+(?= description:)" | head -n 1
-}
-
-packer_version() {
-    echo $PACKER_VERSION
-}
-
-terraform_version() {
-    echo $TERRAFORM_VERSION
 }
 
 built_by() {
@@ -113,11 +101,8 @@ labels() {
     av=$(awscli_version) || return 1
     echo "... got awscli version $av" >&2
 
-    cv=$(credstash_version) || return 1
-    echo "... got credstash version $cv" >&2
-
-    fv=$(ghfetch_version) || return 1
-    echo "... got ghfetch version $fv" >&2
+    gv=$(g3_version) || return 1
+    echo "... got g3 version $fv" >&2
 
     jv=$(apk_pkg_version $ai 'jq') || return 1
     echo "... got jq version $jv" >&2
@@ -128,66 +113,58 @@ labels() {
     gt=$(git describe 2>/dev/null || echo "no-git-tag")
     bb=$(built_by) || return 1
 
+    ts=$(date +'%Y%m%d%H%M%S')
     echo "... got all label data" >&2
     cat<<EOM
-    --label version=$(date +'%Y%m%d%H%M%S')
-    --label opsgang.alpine_version=$ai
-    --label opsgang.awscli_version=$av
-    --label opsgang.credstash_version=$cv
-    --label opsgang.ghfetch_version=$fv
-    --label opsgang.jq_version=$jv
-    --label opsgang.build_git_uri=$gu
-    --label opsgang.build_git_sha=$gs
-    --label opsgang.build_git_branch=$gb
-    --label opsgang.build_git_tag=$gt
-    --label opsgang.built_by="$bb"
+    --label version=$ts
+    --label opsgang.aws_env.version=$ts
+    --label opsgang.aws_env.alpine_version=$ai
+    --label opsgang.aws_env.awscli_version=$av
+    --label opsgang.aws_env.g3_version=$gv
+    --label opsgang.aws_env.jq_version=$jv
+    --label opsgang.aws_env.build_git_uri=$gu
+    --label opsgang.aws_env.build_git_sha=$gs
+    --label opsgang.aws_env.build_git_branch=$gb
+    --label opsgang.aws_env.build_git_tag=$gt
+    --label opsgang.aws_env.built_by="$bb"
 EOM
 }
 
 # Currently we are using the opsgang fork of gruntwork's 'fetch'.
-# Amongst other changes, we are renaming the binary ghfetch
+# Amongst other changes, we are renaming the binary g3
 # as it only works with the github api, not other git services.
 # Until we make those changes to our fork, we do the renaming here.
-latest_ghfetch_binary() {
-    local FETCH_REPO="https://github.com/opsgang/fetch"
-    local FETCH_BOOT_VERSION="v0.1.1" # fixed tag to use to get latest "stable"
-    local FETCH_DESIRED="~>0.1.0"
-    local FETCH_RELEASE_URL="${FETCH_REPO}/releases/download/${FETCH_BOOT_VERSION}/fetch.tgz"
-
-    set -o pipefail
-    if ! curl -sS -L -H 'Accept: application/octet-stream' $FETCH_RELEASE_URL | tar -xzv
-    then
-        echo "ERROR: could not fetch bootstrap 'fetch' binary from $FETCH_RELEASE_URL" >&2
-        return 1
-    fi
-
-    mv fetch fetch.init
-
-    echo "INFO: getting latest fetch (semver constraint: $FETCH_DESIRED)"
-    if ! ./fetch.init --repo ${FETCH_REPO} --tag="${FETCH_DESIRED}" --release-asset="fetch.tgz" .
-    then
-        echo "ERROR: could not fetch a better version of fetch binary" >&2
-        return 1
-    fi
-
-    tar xzvf fetch.tgz >/dev/null 2>&1
-
-    if ! ls -1 fetch | grep -Po '^fetch$' >/dev/null 2>&1
-    then
-        echo "ERROR: could not extract fetch binary from tgz"
-        return 1
-    else
-        echo "INFO: I've, um, fetched 'fetch' :)"
-        echo "INFO: ... renaming to more accurate ghfetch"
-        mv fetch ghfetch
-    fi
-    rm -rf fetch.init fetch.tgz
+latest_g3_binary() {
+    get_g3_init || return 1
     return 0
 }
 
+get_g3_init() {
+    local g3_init_version="v0.1.1" # fixed tag to use to get latest "stable"
+    local g3_init="build/g3"
+    local g3_url="${g3_repo}/releases/download/${g3_init_version}/${g3_release_name}"
+
+    (
+        set -o pipefail
+        if ! curl -sS -L -H 'Accept: application/octet-stream' $g3_url | tar -xzv
+        then
+            echo >&2 "ERROR: could not fetch g3 binary from $g3_url"
+            return 1
+        fi
+    )
+
+    mv fetch $g3_init
+}
+
 docker_build(){
+    export g3_desired_constraint="~>0.1.0"
+    export g3_repo="https://github.com/opsgang/fetch"
+    export g3_init="build/g3"
+    export g3_release_name="fetch.tgz"
+    export g3_extracted_bin="fetch"
+
     valid_docker_version || return 1
-    latest_ghfetch_binary || return 1
+    get_g3_init || return 1
 
     labels=$(labels) || return 1
     n=$(img_name) || return 1
@@ -196,7 +173,14 @@ docker_build(){
     echo "$labels"
     echo "INFO: building $n:$IMG_TAG"
 
-    docker build --no-cache=true --force-rm $labels -t $n:$IMG_TAG .
+    docker build --no-cache=true --force-rm \
+        --build-arg g3_repo \
+        --build-arg g3_desired_constraint \
+        --build-arg g3_init \
+        --build-arg g3_release_name \
+        --build-arg g3_extracted_bin \
+        $labels \
+        -t $n:$IMG_TAG .
 }
 
 docker_build

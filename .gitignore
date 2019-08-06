@@ -2,5 +2,7 @@
 **/.ssh
 **/alpine_build_scripts
 **/*.swp
-fetch.init
-fetch
+**/g3
+**/gogitget
+**/fetch
+**/*.init

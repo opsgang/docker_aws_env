@@ -1,29 +1,36 @@
 [1]: http://docs.aws.amazon.com/cli/latest/reference "use aws apis from cmd line"
-[2]: https://github.com/fugue/credstash "credstash - store and retrieve secrets in aws"
-[3]: https://github.com/opsgang/alpine_build_scripts/blob/master/install_essentials.sh "common GNU tools useful for automation"
+[2]: build/install_essentials.sh "common GNU tools useful for automation"
 # docker\_aws\_env
 
-_... defines an **alpine linux** container providing an env to run bash or_
-_python scripts, that need awscli, credstash, curl and / or jq._
+>
+> **alpine linux 3.10** image providing a consistent env
+> for bash or python3 scripts along with a bunch of
+> useful scripting tools and libs for working with aws.
+>
 
 ## featuring ...
 
 * [aws cli][1]
 
-* [credstash][2] (for managing secrets in aws)
+* python3
 
-* bash, curl, git, make, jq, openssh client [and friends][3]
+* bash 5
+
+* curl, git, make, jq, openssh client [and friends][2]
 
 ## docker tags
 
->
-> You are encouraged to use the semver docker tags.
->
-> You can peg to the latest major, or latest major.minor version
-> instead of a specific major.minor.patch version if you prefer.
->
-> e.g. opsgang/aws\_env:1 # the latest 1.x.x
->      opsgang/aws\_env:1.2 # the latest 1.2.x
+### semver
+
+Part of, or the entire numeric portion of a semver string.
+
+* Major
+    e.g. opsgang/aws\_env:2 - latest 2.x.x build
+* Major.Minor
+    e.g. opsgang/aws\_env:2.3 - latest 2.3.x build
+* Major.Minor.Patch
+    e.g. opsgang/aws\_env:2.3.1 - the 2.3.1 build
+    This tag is immutable - it is never reassigned to a different image
 
 ## building
 
@@ -34,14 +41,13 @@ _python scripts, that need awscli, credstash, curl and / or jq._
 ```bash
 git clone https://github.com/opsgang/docker_aws_env.git
 cd docker_aws_env
-git clone https://github.com/opsgang/alpine_build_scripts
 ./build.sh # adds custom labels to image
 ```
 
 ## installing
 
 ```bash
-docker pull opsgang/aws_env:stable # or use the tag you prefer
+docker pull opsgang/aws_env:2 # or use the tag you prefer
 ```
 
 ## running
